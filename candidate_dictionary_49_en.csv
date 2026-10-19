@@ -1,0 +1,50 @@
+field,domain,business_meaning,construction,source,evidence_status,governance_class
+VendorID,Trip context,Which TLC technology provider recorded the trip.,Retain the source vendor identifier; treat unknown values as missing.,TLC,Not yet benchmarked,candidate_predictor
+passenger_count,Trip context,"Reported party size, potentially related to pickup and service patterns.",Preserve the reported count and its source missingness without global imputation.,TLC,CV only,candidate_predictor
+RatecodeID,Trip context,The reported fare-rate category associated with the trip.,Retain the TLC rate code as a categorical candidate.,TLC,Not yet benchmarked,candidate_predictor
+PULocationID,Geography,Pickup area's spatial context for demand and trip duration.,Validate the source pickup ID against the official Taxi Zone lookup.,TLC / Taxi Zones,Group validated,candidate_predictor
+DOLocationID,Geography,Destination area's spatial context for route complexity.,Validate the source drop-off ID against the official Taxi Zone lookup.,TLC / Taxi Zones,Group validated,candidate_predictor
+taxi_type,Trip context,Service segment: Yellow or Green taxi.,Derive the service type from the monthly TLC source family.,TLC,Benchmark baseline,candidate_predictor
+trip_duration_minutes,Target,Elapsed ride time to be predicted in minutes.,Subtract recorded local drop-off from local pickup wall-clock timestamps; retain positive durations of at most 180 minutes.,TLC,Target,target
+passenger_count_missing,Data quality,Whether party-size information is unavailable.,Mark source passenger_count as missing before fitting any imputer.,TLC,CV only,candidate_predictor
+trip_distance,Distance,Recorded route length associated with the completed trip.,Retain finite non-negative TLC distance including zero; actual meter distance is not proven to be known at departure.,TLC,Not selected in screen,distance_assisted_candidate
+weather_match_time_unknown,Data quality,Whether an ambiguous local pickup time prevents a unique UTC weather match.,Flag fall-back DST ambiguity; keep the trip and leave matched weather empty.,TLC / NOAA,Not selected in screen,candidate_predictor
+temperature_c,Weather,Pre-pickup air temperature at the Central Park station.,Match the latest eligible NOAA temperature at or before pickup within 120 minutes.,NOAA,Not selected in screen,candidate_predictor
+temperature_c_observation_age_minutes,Weather,How recent the matched temperature observation is.,Measure elapsed minutes between pickup UTC and the matched temperature observation UTC.,NOAA,Not selected in screen,candidate_predictor
+wind_speed_m_s,Weather,Pre-pickup wind conditions at the Central Park station.,Match the latest eligible NOAA wind observation within the backward 120-minute window.,NOAA,Not selected in screen,candidate_predictor
+wind_speed_m_s_observation_age_minutes,Weather,How recent the wind-speed report is.,Measure elapsed minutes from its matched observation to pickup.,NOAA,Not selected in screen,candidate_predictor
+precipitation_mm,Weather,Measured pre-pickup precipitation amount when a numeric reading exists.,Match eligible prior NOAA precipitation; keep trace and missing states distinct from measured zero.,NOAA,Not selected in screen,candidate_predictor
+precipitation_mm_observation_age_minutes,Weather,How recent the matched precipitation report is.,Measure elapsed minutes from its matched observation to pickup.,NOAA,Not selected in screen,candidate_predictor
+visibility_km,Weather,"Pre-pickup station visibility, a proxy for travel conditions.",Match the latest eligible NOAA visibility within 120 minutes before pickup.,NOAA,Not selected in screen,candidate_predictor
+visibility_km_observation_age_minutes,Weather,How recent the matched visibility report is.,Measure elapsed minutes from its matched observation to pickup.,NOAA,Not selected in screen,candidate_predictor
+pickup_borough,Geography,Broader city area where the ride begins.,Look up the pickup LocationID in the official Taxi Zone table.,Taxi Zones,Group validated,candidate_predictor
+pickup_zone_name,Geography,Human-readable pickup neighborhood or zone.,Look up the pickup zone name by LocationID.,Taxi Zones,Not yet benchmarked,candidate_predictor
+pickup_service_zone,Geography,Pickup area's TLC service-zone classification.,Look up the pickup service-zone label by LocationID.,Taxi Zones,Not yet benchmarked,candidate_predictor
+dropoff_borough,Geography,Broader city area where the ride ends.,Look up the drop-off LocationID in the official Taxi Zone table.,Taxi Zones,Group validated,candidate_predictor
+dropoff_zone_name,Geography,Human-readable destination neighborhood or zone.,Look up the drop-off zone name by LocationID.,Taxi Zones,Not yet benchmarked,candidate_predictor
+dropoff_service_zone,Geography,Destination area's TLC service-zone classification.,Look up the drop-off service-zone label by LocationID.,Taxi Zones,Not yet benchmarked,candidate_predictor
+same_zone,Route,Whether a ride starts and ends inside one Taxi Zone.,Compare validated pickup and drop-off LocationIDs.,TLC / Taxi Zones,Group validated,candidate_predictor
+same_borough,Route,Whether both endpoints share a known borough.,Compare lookup boroughs only when both are known; retain unknown otherwise.,TLC / Taxi Zones,Group validated,candidate_predictor
+airport_trip,Route,Whether either endpoint is an officially named airport zone.,Check both endpoint zones against airport entries in the official lookup.,Taxi Zones,Group validated,candidate_predictor
+pickup_month,Time,Season of the trip's pickup.,Extract month from the normalized New York local pickup timestamp.,TLC,Not selected in screen,candidate_predictor
+pickup_hour,Time,Time of day at pickup.,Extract hour from the normalized New York local pickup timestamp.,TLC,Not selected in screen,candidate_predictor
+pickup_weekday,Time,Day-of-week travel context.,Extract weekday from the normalized New York local pickup timestamp.,TLC,Not selected in screen,candidate_predictor
+is_weekend,Time,Whether the pickup falls on a weekend.,Flag Saturday or Sunday in New York local time.,TLC,Not selected in screen,candidate_predictor
+pickup_hour_sin,Time,Cyclical time-of-day representation for a smooth day boundary.,Encode pickup hour on a 24-hour sine cycle.,TLC,Benchmark baseline,candidate_predictor
+pickup_hour_cos,Time,Companion cyclical time-of-day representation.,Encode pickup hour on a 24-hour cosine cycle.,TLC,Benchmark baseline,candidate_predictor
+pickup_weekday_sin,Time,Cyclical day-of-week representation.,Encode local pickup weekday on a seven-day sine cycle.,TLC,Benchmark baseline,candidate_predictor
+pickup_weekday_cos,Time,Companion cyclical day-of-week representation.,Encode local pickup weekday on a seven-day cosine cycle.,TLC,Benchmark baseline,candidate_predictor
+pickup_month_sin,Time,Cyclical position in the calendar year.,Encode local pickup month on a 12-month sine cycle.,TLC,Benchmark baseline,candidate_predictor
+pickup_month_cos,Time,Companion cyclical calendar-year representation.,Encode local pickup month on a 12-month cosine cycle.,TLC,Benchmark baseline,candidate_predictor
+is_holiday,Time,Whether the pickup falls on an observed U.S. federal holiday.,Join the local pickup date to the OPM observed-holiday calendar.,OPM,Not selected in screen,candidate_predictor
+weather_missing_temperature,Data quality,Whether an eligible pre-pickup temperature is unavailable.,Flag missing matched temperature before model-specific imputation.,NOAA,Not selected in screen,candidate_predictor
+weather_missing_wind_speed,Data quality,Whether an eligible pre-pickup wind report is unavailable.,Flag missing matched wind speed before model-specific imputation.,NOAA,Not selected in screen,candidate_predictor
+precipitation_trace_flag,Weather,Whether NOAA records precipitation as a trace rather than a measured amount.,Preserve NOAA trace coding separately from numeric zero and missing precipitation.,NOAA,Not selected in screen,candidate_predictor
+weather_missing_precipitation,Data quality,Whether an eligible precipitation report is unavailable.,Flag missing matched precipitation while preserving trace and measured zero.,NOAA,Not selected in screen,candidate_predictor
+weather_missing_visibility,Data quality,Whether an eligible visibility report is unavailable.,Flag missing matched visibility before model-specific imputation.,NOAA,Not selected in screen,candidate_predictor
+weather_missing_all,Data quality,Whether every matched weather variable is unavailable.,"Flag trips with no eligible temperature, wind, precipitation or visibility observation.",NOAA,Not yet benchmarked,candidate_predictor
+temperature_category,Weather,Exploratory temperature band for nonlinear weather-response testing.,Classify matched Celsius temperature using exploratory thresholds; do not assume predictive value.,NOAA,Not selected in screen,candidate_predictor
+precipitation_category,Weather,"Precipitation state including missing, trace and measured values.",Categorize matched precipitation without converting unknown or trace to dry weather.,NOAA,Not selected in screen,candidate_predictor
+weather_phenomenon_codes,Weather,"Reported weather events such as rain or snow, where NOAA codes exist.",Retain NOAA present-weather observation codes without inferring snowfall from snow depth.,NOAA,Not yet benchmarked,candidate_predictor
+weather_phenomenon_category,Weather,Exploratory event category derived from reported weather phenomena.,Map NOAA present-weather codes to documented candidate event categories.,NOAA,Not selected in screen,candidate_predictor
+log1p_trip_distance,Distance,Compressed route-distance representation that reduces extreme right skew.,Apply log(1 + recorded non-negative trip distance); availability-at-departure caveat still applies.,TLC,Benchmark baseline,candidate_predictor
